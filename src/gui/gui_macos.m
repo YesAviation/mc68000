@@ -61,6 +61,9 @@ GuiWindow *guiCreateWindow(const GuiConfig *config) {
                                      config->width, config->height);
         win->imageView = [[NSImageView alloc] initWithFrame:imgFrame];
         [win->imageView setImageScaling:NSImageScaleProportionallyUpOrDown];
+        [win->imageView setWantsLayer:YES];
+        [win->imageView.layer setMagnificationFilter:kCAFilterNearest];
+        [win->imageView.layer setMinificationFilter:kCAFilterNearest];
         [[win->nsWindow contentView] addSubview:win->imageView];
 
         /* Console text view */

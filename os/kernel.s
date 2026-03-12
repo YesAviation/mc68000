@@ -288,8 +288,8 @@ video_init:
     LEA     VIDEO_PALETTE, A0
     MOVE.W  #255, D0
 vpal_loop:
-    MOVE.W  D0, D1
-    ANDI.W  #$FF, D1
+    MOVE.W  #255, D1
+    SUB.W   D0, D1
     MOVE.W  D1, D2
     LSR.W   #3, D2
     MOVE.W  D2, -(A7)

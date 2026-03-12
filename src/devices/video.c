@@ -9,7 +9,8 @@ static inline u32 rgb565ToRGBA(u16 c) {
     u32 r = ((c >> 11) & 0x1F) << 3;
     u32 g = ((c >>  5) & 0x3F) << 2;
     u32 b = ((c >>  0) & 0x1F) << 3;
-    return (r << 24) | (g << 16) | (b << 8) | 0xFF;
+    /* Store as R,G,B,A in memory (little-endian: LSB first) */
+    return r | (g << 8) | (b << 16) | (0xFFu << 24);
 }
 
 /* ── register access ─────────────────────────────────── */

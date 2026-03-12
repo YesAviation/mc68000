@@ -95,6 +95,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
+        u32 *smallbuf    = calloc(320 * 240, sizeof(u32));
         u32 *framebuffer = calloc(640 * 480, sizeof(u32));
 
         while (guiProcessEvents(win) && !machine->cpu.halted) {
@@ -103,8 +104,21 @@ int main(int argc, char *argv[]) {
             /* Run one frame worth of CPU cycles */
             machineRunFrame(machine);
 
-            /* Render video */
-            videoRenderRGBA(machine->video, framebuffer, 640, 480);
+            /* Render video at native 320x240 */
+            videoRenderRGBA(machine->video, smallbuf, 320, 240);
+
+            /* 2x nearest-neighbour upscale to 640x480 */
+            for (int y = 0; y < 240; y++) {
+                for (int x = 0; x < 320; x++) {
+                    u32 p = smallbuf[y * 320 + x];
+                    int dy = y * 2, dx = x * 2;
+                    framebuffer[dy       * 640 + dx    ] = p;
+                    framebuffer[dy       * 640 + dx + 1] = p;
+                    framebuffer[(dy + 1) * 640 + dx    ] = p;
+                    framebuffer[(dy + 1) * 640 + dx + 1] = p;
+                }
+            }
+
             guiUpdateFramebuffer(win, framebuffer, 640, 480);
 
             /* Forward UART output to console */
@@ -125,6 +139,7 @@ int main(int argc, char *argv[]) {
             if (frameTime < 16) guiSleepMs((u32)(16 - frameTime));
         }
 
+        free(smallbuf);
         free(framebuffer);
         guiDestroyWindow(win);
     }
